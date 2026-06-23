@@ -1,56 +1,38 @@
-# Projekt końcowy – Relacyjne bazy danych
+# pd5417-projekt-CONT
 
-## Temat projektu
+Projekt konteneryzacji analizy jakości danych sekwencyjnych z wykorzystaniem FastQC.
 
-System zarządzania danymi bioinformatycznymi.
+## Zawartość repozytorium
 
-## Wyniki zapytań SQL
+- Dockerfile – obraz Docker zawierający narzędzie FastQC
+- docker-compose.yml – konfiguracja usług FastQC i Nginx
+- nginx.conf – konfiguracja serwera WWW Nginx
+- fastqc_report.png – przykładowy raport wygenerowany przez FastQC
 
-### Zapytanie 4ii
+## Cel projektu
 
-```sql
-SELECT
-    t.test_type,
-    COUNT(DISTINCT pt.patient_id) AS liczba_pacjentow
-FROM tests t
-JOIN patient_test pt ON t.test_id = pt.test_id
-GROUP BY t.test_type
-HAVING COUNT(DISTINCT pt.patient_id) > 30;
+Celem projektu było przygotowanie środowiska kontenerowego umożliwiającego automatyczną analizę jakości danych sekwencyjnych zapisanych w pliku FASTQ przy użyciu narzędzia FastQC oraz udostępnienie wyników analizy za pomocą serwera WWW Nginx.
+
+## Uruchomienie
+
+```bash
+docker-compose up --build
 ```
 
-**Wynik**
+## Wyniki
 
-| test_type | liczba_pacjentow |
-|------------|------------------|
-| NGS-panel | 38 |
-| SNP Array | 39 |
+Po uruchomieniu projektu raport FastQC dostępny jest pod adresem:
 
-### Zapytanie 4iii
+http://localhost:8080
 
-```sql
-SELECT
-    t.test_type,
-    AVG(warianty.liczba_wariantow) AS srednia_liczba_wariantow
-FROM (
-    SELECT test_id, COUNT(*) AS liczba_wariantow
-    FROM results
-    GROUP BY test_id
-) warianty
-JOIN tests t ON warianty.test_id = t.test_id
-GROUP BY t.test_type;
-```
+Przykładowy wynik analizy został zapisany w pliku:
 
-**Wynik**
+- fastqc_report.png
 
-| test_type | srednia_liczba_wariantow |
-|------------|--------------------------|
-| SNP Array | 3.0000 |
-| NGS-panel | 3.6857 |
-| WES | 3.5294 |
-| WGS | 3.6071 |
+## Wykorzystane narzędzia
 
-## Pliki CSV
-
-- patients_tests.csv
-- patients_both_tests.csv
-- pathogenic_results.csv
+- Docker
+- Docker Compose
+- FastQC
+- Nginx
+- Ubuntu 22.04
